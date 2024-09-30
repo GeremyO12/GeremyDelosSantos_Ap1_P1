@@ -2,10 +2,10 @@
 
 namespace GeremyDelosSantos_Ap1_P1.Models;
 
-public class Registro
+public class Prestamos
 {
     [Key]
-    public string RegistroId { get; set; }
+    public string PrestamosId { get; set; }
     [Required]
     public string Nombre { get; set; }
 }
