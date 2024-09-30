@@ -2,7 +2,7 @@
 
 namespace GeremyDelosSantos_Ap1_P1.Services;
 
-public class RegistroServices(Contexto Contexto)
+public class PrestamosServices(Contexto Contexto)
 {
     //guardar
     //buscar
