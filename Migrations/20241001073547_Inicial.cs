@@ -11,15 +11,18 @@ namespace GeremyDelosSantos_Ap1_P1.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Registro",
+                name: "Prestamos",
                 columns: table => new
                 {
-                    RegistroId = table.Column<string>(type: "TEXT", nullable: false),
-                    Nombre = table.Column<string>(type: "TEXT", nullable: false)
+                    PrestamosId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Deudor = table.Column<string>(type: "TEXT", nullable: false),
+                    Concepto = table.Column<string>(type: "TEXT", nullable: false),
+                    Monto = table.Column<double>(type: "REAL", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Registro", x => x.RegistroId);
+                    table.PrimaryKey("PK_Prestamos", x => x.PrestamosId);
                 });
         }
 
@@ -27,7 +30,7 @@ namespace GeremyDelosSantos_Ap1_P1.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Registro");
+                name: "Prestamos");
         }
     }
 }
