@@ -1,23 +1,23 @@
 ﻿@page "/"
-@page "/Prestamos/Index/"
-@page "/Prestamos/Index/{PrestamosId:int}"
-@inject PrestamosServices prestamosServices
+@page "/Prestamos/Index"
 @rendermode InteractiveServer
-
+@inject PrestamosServices prestamosService
+@inject NavigationManager navigation
 
 <EditForm Model="ListaPrestamos" class="border shadow-lg p-3 rounded">
     <div class="card-header bg-primary text-white text-center py-2 rounded">
-        <h3 style="font-weight: bold;" class="mb-0">Consulta</h3>
+        <h3 style="font-weight: bold;" class="mb-0 font-weight-bold">Consulta Prestamos</h3>
     </div>
     <div class="card-body">
         <div class="row mb-3 align-items-end">
+            
             <div class="col-md-3">
                 <label for="Filtro" class="form-label">Filtrar por:</label>
                 <select @bind="filtro" class="form-select">
                     <option value="id">ID</option>
-                    <option value="deudor">Deudor</option>
+                    <option value="Deudor">Deudor</option>
                     <option value="concepto">Concepto</option>
-                    <option value="monto">Monto</option>
+                    <option value="Monto">Monto</option>
                 </select>
             </div>
 
@@ -30,93 +30,93 @@
                     </button>
                 </div>
             </div>
-
+            
             <div class="col-md-3 text-end">
-                <a href="/Prestamos/Create" class="btn btn-success" type="button">
-                    <span class="bi bi-floppy"></span> Crear
-                </a>
+                <a href="/Prestamo/Create" class="btn btn-success" type="button"><span class="bi bi-plus-square mt-3"></span> Crear </a>
             </div>
         </div>
     </div>
 
+    
     <table class="table table-bordered text-center">
         <thead class="bg-primary text-white">
             <tr>
-                <th>Id</th>
+                <th>PrestamoId</th>
                 <th>Deudor</th>
                 <th>Concepto</th>
                 <th>Monto</th>
-                <th>Ver</th>
                 <th>Editar</th>
                 <th>Eliminar</th>
             </tr>
         </thead>
+
         <tbody>
-            @foreach (var prestamo in ListaPrestamos)
+            @foreach (var prestamos in ListaPrestamos)
             {
                 <tr>
-                    <td>@prestamo.PrestamosId</td>
-                    <td>@prestamo.Deudor</td>
-                    <td>@prestamo.Concepto</td>
-                    <td>@prestamo.Monto</td>
+                    <td>@prestamos.PrestamosId</td>
+                    <td>@prestamos.Deudor</td>
+                    <td>@prestamos.Concepto</td>
+                    <td>@prestamos.Monto</td>
 
                     <td>
-                        <a href="/Prestamos/Details/@prestamo.PrestamosId" class="btn-detalle" style="border: none; background-color: transparent;">
-                            <span class="bi bi-info-circle-fill" style="font-size: 2rem;"></span>
+                        
+                        <a href="/Prestamo/Edit/@prestamos.PrestamosId" style="border: none; background-color: transparent;" class="btn-editar">
+                            <span class="btn bi bi-pencil-square" style="font-size: 2rem;"></span>
                         </a>
                     </td>
+
                     <td>
-                        <a href="/Prestamos/Edit/@prestamo.PrestamosId" class="btn-editar" style="border: none; background-color: transparent;">
-                            <span class="bi bi-marker-tip" style="font-size: 2rem;"></span>
-                        </a>
-                    </td>
-                    <td>
-                        <a href="/Prestamos/Delete/@prestamo.PrestamosId" class="btn-eliminar" style="border: none; background-color: transparent;">
-                            <span class="bi bi-trash" style="font-size: 2rem;"></span>
+                        
+                        <a href="/Prestamo/Delete/@prestamos.PrestamosId" style="border: none; background-color: transparent;" class="btn-eliminar">
+                            <i class="btn bi bi-trash" style="font-size: 2rem;"></i>
                         </a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
+    
 </EditForm>
 
 @code {
-    [Parameter]
-    public int PrestasmosId { get; set; }
+    public Prestamos Prestamos { get; set; } = new Prestamos();
     public List<Prestamos> ListaPrestamos = new List<Prestamos>();
     private string valorFiltro = "";
     private string filtro = "Id";
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        ListaPrestamos = prestamosServices.Listar(c => true);
+        ListaPrestamos = await prestamosService.Listar(p => true);
     }
-    public void Buscar()
+
+    public async Task Buscar()
     {
-        if (valorFiltro.Trim() != "")
+        if (!string.IsNullOrWhiteSpace(valorFiltro))
         {
-            if (filtro == "id" && int.TryParse(valorFiltro, out int PrestamosId))
+            if (filtro == "id" && int.TryParse(valorFiltro, out int PrestamoId))
             {
-                ListaPrestamos = prestamosServices.Listar(a => a.PrestamosId == PrestamosId);
+                ListaPrestamos = await prestamosService.Listar(p => p.PrestamosId == PrestamoId);
             }
             else if (filtro == "deudor")
             {
-                ListaPrestamos = prestamosServices.Listar(a => a.Deudor == valorFiltro);
+                string filtroMinuscula = valorFiltro.ToLower();
+                ListaPrestamos = await prestamosService.Listar(p => p.Deudor.ToLower().Contains(filtroMinuscula));
+
             }
             else if (filtro == "concepto")
             {
-                ListaPrestamos = prestamosServices.Listar(a => a.Concepto == valorFiltro);
+                string filtroMinuscula = valorFiltro.ToLower();
+                ListaPrestamos = await prestamosService.Listar(p => p.Concepto.ToLower().Contains(filtroMinuscula));
             }
-            else if (filtro == "monto" && decimal.TryParse(valorFiltro, out decimal monto))
+            else if (filtro == "monto" && double.TryParse(valorFiltro, out double Monto))
             {
-                ListaPrestamos = prestamosServices.Listar(a => a.Monto == monto);
+                ListaPrestamos = await prestamosService.Listar(p => p.Monto == Monto);
             }
-            
-        }
-        else
-        {
-            ListaPrestamos = prestamosServices.Listar(a => true);
+            else
+            {
+                ListaPrestamos = await prestamosService.Listar(p => true);
+            }
         }
     }
 }
